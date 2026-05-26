@@ -1,4 +1,4 @@
-import { data, Navigate } from "react-router";
+import { Navigate } from "react-router";
 import * as z from "zod";
 
 export default function ProtectRoute({

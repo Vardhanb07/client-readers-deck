@@ -23,14 +23,17 @@ function AppRouter() {
             </ProtectRoute>
           }
         />
-        <Route
-          path="category/:id/items"
-          element={
-            <ProtectRoute>
-              <Items />
-            </ProtectRoute>
-          }
-        />
+        <Route path="category">
+          <Route
+            path=":id/items"
+            element={
+              <ProtectRoute>
+                <Items />
+              </ProtectRoute>
+            }
+          />
+          <Route path="add" />
+        </Route>
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

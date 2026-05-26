@@ -15,7 +15,7 @@ export default function BaseLayout({
         </p>
         <ModeToggle />
       </div>
-      <div className="flex w-full p-10 justify-center items-center">
+      <div className="flex flex-col w-full p-10 justify-center items-center">
         {children}
       </div>
     </div>
