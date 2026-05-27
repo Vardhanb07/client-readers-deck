@@ -23,7 +23,6 @@ export function LoginForm({
               const data = new FormData(e.target);
               const key = data.get("key");
               const value = data.get("value");
-              console.log(data);
               localStorage.setItem(
                 "header",
                 JSON.stringify({ key: key, value: value }),
