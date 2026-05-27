@@ -5,26 +5,24 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 // https://vite.dev/config/
-export default defineConfig(() => {
-  return {
-    plugins: [
-      react(),
-      babel({ presets: [reactCompilerPreset()] }),
-      tailwindcss(),
-    ],
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
+export default defineConfig({
+  plugins: [
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
+    tailwindcss(),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://readers-deck.vardhanbattula7.workers.dev/api/v1",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-    server: {
-      proxy: {
-        "/api": {
-          target: "https://readers-deck.vardhanbattula7.workers.dev/api/v1",
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ""),
-        },
-      },
-    },
-  };
+  },
 });
