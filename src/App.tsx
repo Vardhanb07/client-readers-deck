@@ -7,6 +7,10 @@ import ProtectRoute from "./components/core/ProtectRoute";
 import Dash from "./pages/Dash";
 import Items from "./pages/Items";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import EditCategory from "./pages/EditCategory";
+import EditItem from "./pages/EditItem";
+import AddCategory from "./pages/AddCategory";
+import AddItem from "./pages/AddItem";
 
 const queryClient = new QueryClient();
 
@@ -23,17 +27,46 @@ function AppRouter() {
             </ProtectRoute>
           }
         />
-        <Route path="category">
-          <Route
-            path=":id/items"
-            element={
-              <ProtectRoute>
-                <Items />
-              </ProtectRoute>
-            }
-          />
-          <Route path="add" />
-        </Route>
+        <Route
+          path="category/add"
+          element={
+            <ProtectRoute>
+              <AddCategory />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="category/:id/edit"
+          element={
+            <ProtectRoute>
+              <EditCategory />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="category/:id/items"
+          element={
+            <ProtectRoute>
+              <Items />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="category/:id/items/add"
+          element={
+            <ProtectRoute>
+              <AddItem />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="category/:id/items/:id/edit"
+          element={
+            <ProtectRoute>
+              <EditItem />
+            </ProtectRoute>
+          }
+        />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
