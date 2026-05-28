@@ -17,7 +17,7 @@ export default function AddCategory() {
         throw new Error("name is invalid");
       }
       const headers = getHeaders();
-      return fetch(`${import.meta.env.VITE_API}/api/category`, {
+      return fetch(`${import.meta.env.VITE_API}/category`, {
         method: "POST",
         headers: {
           ...headers,

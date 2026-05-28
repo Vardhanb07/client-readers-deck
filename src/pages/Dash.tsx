@@ -15,7 +15,7 @@ export default function Dash() {
     queryKey: ["categories"],
     queryFn: async () => {
       const headers = getHeaders();
-      const res = await fetch(`${import.meta.env.VITE_API}/api/category`, {
+      const res = await fetch(`${import.meta.env.VITE_API}/category`, {
         method: "GET",
         headers: headers,
       });
@@ -45,7 +45,7 @@ export default function Dash() {
   const mutation = useMutation({
     mutationFn: (id: number) => {
       const headers = getHeaders();
-      return fetch(`${import.meta.env.VITE_API}/api/category/${id}`, {
+      return fetch(`${import.meta.env.VITE_API}/category/${id}`, {
         method: "DELETE",
         headers: headers,
       });

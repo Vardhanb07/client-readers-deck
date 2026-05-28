@@ -19,7 +19,7 @@ export default function EditCategory() {
         throw new Error("name is invalid");
       }
       const headers = getHeaders();
-      return fetch(`${import.meta.env.VITE_API}/api/category/${id}`, {
+      return fetch(`${import.meta.env.VITE_API}/category/${id}`, {
         method: "PATCH",
         headers: {
           ...headers,

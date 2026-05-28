@@ -26,7 +26,7 @@ export default function AddItem() {
         throw new Error("categoryId is invalid");
       }
 
-      return fetch(`${import.meta.env.VITE_API}/api/item`, {
+      return fetch(`${import.meta.env.VITE_API}/item`, {
         method: "POST",
         headers: {
           ...headers,

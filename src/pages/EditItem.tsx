@@ -30,7 +30,7 @@ export default function EditItem() {
         throw new Error("categoryId is invalid");
       }
 
-      return fetch(`${import.meta.env.VITE_API}/api/item/${id}`, {
+      return fetch(`${import.meta.env.VITE_API}/item/${id}`, {
         method: "PATCH",
         headers: {
           ...headers,
@@ -55,7 +55,7 @@ export default function EditItem() {
     queryKey: ["item", id],
     queryFn: async () => {
       const headers = getHeaders();
-      const res = await fetch(`${import.meta.env.VITE_API}/api/item/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API}/item/${id}`, {
         method: "GET",
         headers: headers,
       });

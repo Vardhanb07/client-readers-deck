@@ -22,7 +22,7 @@ export default function Items() {
         throw new Error("id is invalid");
       }
       const res = await fetch(
-        `${import.meta.env.VITE_API}/api/category/${categoryId}/item`,
+        `${import.meta.env.VITE_API}/category/${categoryId}/item`,
         {
           method: "GET",
           headers: headers,
