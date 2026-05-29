@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { getApiv1, getHeaders } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function AddItem() {
 	const navigate = useNavigate();
@@ -14,33 +14,14 @@ export default function AddItem() {
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: (formData: FormData) => {
-			if (!categoryId) {
-				throw new Error("categoryId is invalid");
-			}
-			const headers = getHeaders();
-			const cidn = Number.parseInt(categoryId, 10);
-			const pages = Number(formData.get("pages"));
-			const currentPage = Number(formData.get("currentPage"));
-			if (Number.isNaN(cidn)) {
-				throw new Error("categoryId is invalid");
-			}
-
-			const apiv1 = getApiv1();
-
-			return fetch(`${apiv1}/item`, {
-				method: "POST",
-				headers: {
-					...headers,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					name: formData.get("name"),
-					categoryId: cidn,
-					pages: pages,
-					currentPage: currentPage,
-				}),
-			});
+		mutationFn: ({
+			formData,
+			categoryId,
+		}: {
+			formData: FormData;
+			categoryId: string | undefined;
+		}) => {
+			return api.postItem({ formData, categoryId });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -64,7 +45,10 @@ export default function AddItem() {
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								mutation.mutate(new FormData(e.currentTarget));
+								mutation.mutate({
+									formData: new FormData(e.currentTarget),
+									categoryId: categoryId,
+								});
 								navigate(`/dash/category/${categoryId}/items`);
 							}}
 						>

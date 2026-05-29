@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { getApiv1, getHeaders } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function AddCategory() {
 	const navigate = useNavigate();
@@ -12,20 +12,8 @@ export default function AddCategory() {
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: (name: FormDataEntryValue | null) => {
-			if (!name) {
-				throw new Error("name is invalid");
-			}
-			const apiv1 = getApiv1();
-			const headers = getHeaders();
-			return fetch(`${apiv1}/category`, {
-				method: "POST",
-				headers: {
-					...headers,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ name }),
-			});
+		mutationFn: ({ formData }: { formData: FormData }) => {
+			return api.postCategory({ formData });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -49,8 +37,8 @@ export default function AddCategory() {
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								const data = new FormData(e.currentTarget);
-								mutation.mutate(data.get("name"));
+								const formData = new FormData(e.currentTarget);
+								mutation.mutate({ formData });
 								navigate("/dash");
 							}}
 						>

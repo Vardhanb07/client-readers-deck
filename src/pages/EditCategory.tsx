@@ -4,30 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { getApiv1, getHeaders } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function EditCategory() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const mutation = useMutation({
-		mutationFn: (name: FormDataEntryValue | null) => {
-			if (!id) {
-				throw new Error("id is invalid");
-			}
-			if (!name) {
-				throw new Error("name is invalid");
-			}
-			const headers = getHeaders();
-			const apiv1 = getApiv1();
-			return fetch(`${apiv1}/category/${id}`, {
-				method: "PATCH",
-				headers: {
-					...headers,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ name }),
-			});
+		mutationFn: ({
+			formData,
+			id,
+		}: {
+			formData: FormData;
+			id: string | undefined;
+		}) => {
+			return api.patchCategory({ formData, id });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -50,8 +41,8 @@ export default function EditCategory() {
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								const data = new FormData(e.target);
-								mutation.mutate(data.get("name"));
+								const formData = new FormData(e.target);
+								mutation.mutate({ formData, id });
 								navigate("/dash");
 							}}
 						>

@@ -2,13 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-import * as z from "zod";
 import BaseSpinner from "@/components/core/BaseSpinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { getApiv1, getHeaders } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function EditItem() {
 	const navigate = useNavigate();
@@ -18,31 +17,16 @@ export default function EditItem() {
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: (formData: FormData) => {
-			if (!categoryId) {
-				throw new Error("categoryId is invalid");
-			}
-			const headers = getHeaders();
-			const cidn = Number.parseInt(categoryId, 10);
-			const pages = Number(formData.get("pages"));
-			const currentPage = Number(formData.get("currentPage"));
-			if (Number.isNaN(cidn)) {
-				throw new Error("categoryId is invalid");
-			}
-			const apiv1 = getApiv1();
-			return fetch(`${apiv1}/item/${id}`, {
-				method: "PATCH",
-				headers: {
-					...headers,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					name: formData.get("name"),
-					categoryId: cidn,
-					pages: pages,
-					currentPage: currentPage,
-				}),
-			});
+		mutationFn: ({
+			formData,
+			categoryId,
+			id,
+		}: {
+			formData: FormData;
+			categoryId: string | undefined;
+			id: string | undefined;
+		}) => {
+			return api.patchItem({ formData, categoryId, id });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -54,25 +38,7 @@ export default function EditItem() {
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ["item", id],
 		queryFn: async () => {
-			const headers = getHeaders();
-			const apiv1 = getApiv1();
-			const res = await fetch(`${apiv1}/item/${id}`, {
-				method: "GET",
-				headers: headers,
-			});
-			const json = await res.json();
-			const parsedSchema = z.object({
-				id: z.number(),
-				name: z.string(),
-				categoryId: z.number(),
-				pages: z.number(),
-				currentPage: z.number(),
-			});
-			const parsed = parsedSchema.safeParse(json);
-			if (!parsed.success) {
-				throw new Error("header is invalid");
-			}
-			return parsed.data;
+			return await api.getItem({ id });
 		},
 	});
 
@@ -101,7 +67,11 @@ export default function EditItem() {
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								mutation.mutate(new FormData(e.currentTarget));
+								mutation.mutate({
+									formData: new FormData(e.currentTarget),
+									categoryId,
+									id,
+								});
 								navigate(`/dash/category/${categoryId}/items`);
 							}}
 						>

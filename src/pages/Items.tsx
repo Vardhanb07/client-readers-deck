@@ -3,7 +3,6 @@ import { Edit, Info, SquarePlus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
-import * as z from "zod";
 import BaseLayout from "@/components/core/BaseLayout";
 import BaseSpinner from "@/components/core/BaseSpinner";
 import {
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent } from "@/components/ui/item";
-import { getApiv1, getHeaders } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function Items() {
 	const { categoryId } = useParams();
@@ -28,30 +27,7 @@ export default function Items() {
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ["category", categoryId, "items"],
 		queryFn: async () => {
-			const headers = getHeaders();
-			if (!categoryId) {
-				throw new Error("id is invalid");
-			}
-			const apiv1 = getApiv1();
-			const res = await fetch(`${apiv1}/category/${categoryId}/item`, {
-				method: "GET",
-				headers: headers,
-			});
-			const json = await res.json();
-			const parsedSchema = z.array(
-				z.object({
-					id: z.number(),
-					name: z.string(),
-					categoryId: z.number(),
-					pages: z.number(),
-					currentPage: z.number(),
-				}),
-			);
-			const parsed = parsedSchema.safeParse(json);
-			if (!parsed.success) {
-				throw new Error("header is invalid");
-			}
-			return parsed.data;
+			return await api.getItems({ categoryId });
 		},
 	});
 
@@ -62,16 +38,8 @@ export default function Items() {
 	}, [isError, error]);
 
 	const mutation = useMutation({
-		mutationFn: (id: number) => {
-			if (!id) {
-				throw new Error("id is invalid");
-			}
-			const headers = getHeaders();
-			const apiv1 = getApiv1();
-			return fetch(`${apiv1}/api/item/${id}`, {
-				method: "DELETE",
-				headers: headers,
-			});
+		mutationFn: ({ id }: { id: number }) => {
+			return api.deleteItem({ id });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -123,7 +91,7 @@ export default function Items() {
 								<button
 									type="button"
 									onClick={() => {
-										mutation.mutate(val.id);
+										mutation.mutate({ id: val.id });
 									}}
 									className="cursor-pointer"
 								>
