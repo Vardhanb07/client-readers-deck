@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, ExternalLink, SquarePlus, Trash2 } from "lucide-react";
+import {
+  Edit,
+  ExternalLink,
+  SquarePlus,
+  Trash2,
+  Trash2Icon,
+} from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -7,72 +13,108 @@ import BaseLayout from "@/components/core/BaseLayout";
 import BaseSpinner from "@/components/core/BaseSpinner";
 import { Item, ItemActions, ItemContent } from "@/components/ui/item";
 import { api } from "@/lib/api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 export default function Dash() {
-	const queryClient = useQueryClient();
-	const { data, isPending, isError, error } = useQuery({
-		queryKey: ["categories"],
-		queryFn: async () => {
-			return await api.getCategories();
-		},
-	});
+  const queryClient = useQueryClient();
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      return await api.getCategories();
+    },
+  });
 
-	useEffect(() => {
-		if (isError && error) {
-			toast.error(error.message, {
-				id: "error-toast",
-			});
-		}
-	}, [isError, error]);
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(error.message, {
+        id: "error-toast",
+      });
+    }
+  }, [isError, error]);
 
-	const mutation = useMutation({
-		mutationFn: ({ id }: { id: number }) => {
-			return api.deleteCategory({ id });
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["categories"],
-			});
-		},
-	});
+  const mutation = useMutation({
+    mutationFn: ({ id }: { id: number }) => {
+      return api.deleteCategory({ id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+    },
+  });
 
-	if (isPending) {
-		return <BaseSpinner />;
-	}
+  if (isPending) {
+    return <BaseSpinner />;
+  }
 
-	return (
-		<BaseLayout title="Categories">
-			<div className="mb-3">
-				<Link to={"category/add"} replace>
-					<SquarePlus />
-				</Link>
-			</div>
-			<div className="flex flex-col w-full h-full">
-				{data?.map((val) => {
-					return (
-						<Item key={val.id}>
-							<ItemContent>{val.name}</ItemContent>
-							<ItemActions>
-								<Link to={`category/${val.id}/edit`} replace>
-									<Edit />
-								</Link>
-								<button
-									type="button"
-									onClick={() => {
-										mutation.mutate({ id: val.id });
-									}}
-									className="cursor-pointer"
-								>
-									<Trash2 />
-								</button>
-								<Link to={`category/${val.id}/items`} replace>
-									<ExternalLink />
-								</Link>
-							</ItemActions>
-						</Item>
-					);
-				})}
-			</div>
-		</BaseLayout>
-	);
+  return (
+    <BaseLayout title="Categories">
+      <div className="mb-3">
+        <Link to={"category/add"} replace>
+          <SquarePlus />
+        </Link>
+      </div>
+      <div className="flex flex-col w-full h-full">
+        {data?.map((val) => {
+          return (
+            <Item key={val.id}>
+              <ItemContent>{val.name}</ItemContent>
+              <ItemActions>
+                <Link to={`category/${val.id}/edit`} replace>
+                  <Edit />
+                </Link>
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <Button variant="destructive">
+                      <Trash2 />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent size="sm">
+                    <AlertDialogHeader>
+                      <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                        <Trash2Icon />
+                      </AlertDialogMedia>
+                      <AlertDialogTitle>Delete category?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete this category and all items
+                        associated with it.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant="outline">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={() => {
+                          mutation.mutate({ id: val.id });
+                        }}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Link to={`category/${val.id}/items`} replace>
+                  <ExternalLink />
+                </Link>
+              </ItemActions>
+            </Item>
+          );
+        })}
+      </div>
+    </BaseLayout>
+  );
 }
