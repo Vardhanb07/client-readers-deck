@@ -11,7 +11,10 @@ class Apiv1 {
 	async getCategories() {
 		const res = await fetch(`${this.#apiv1}/category`, {
 			method: "GET",
-			headers: this.#headers,
+			headers: {
+				...this.#headers,
+				Accept: "application/json",
+			},
 		});
 		const json = await res.json();
 		const parsedSchema = z.array(
@@ -75,7 +78,10 @@ class Apiv1 {
 		}
 		const res = await fetch(`${this.#apiv1}/category/${categoryId}/item`, {
 			method: "GET",
-			headers: this.#headers,
+			headers: {
+				...this.#headers,
+				Accept: "application/json",
+			},
 		});
 		const json = await res.json();
 		const parsedSchema = z.array(
@@ -96,7 +102,10 @@ class Apiv1 {
 	async getItem({ id }: { id: string | undefined }) {
 		const res = await fetch(`${this.#apiv1}/item/${id}`, {
 			method: "GET",
-			headers: this.#headers,
+			headers: {
+				...this.#headers,
+				Accept: "application/json",
+			},
 		});
 		const json = await res.json();
 		const parsedSchema = z.object({
