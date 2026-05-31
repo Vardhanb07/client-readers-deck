@@ -14,11 +14,11 @@ const headerSchema = z.object({
 export function getHeaders() {
 	const headerVal = localStorage.getItem("header");
 	if (!headerVal) {
-		throw new Error("header is invalid");
+		return {};
 	}
 	const header = headerSchema.safeParse(JSON.parse(headerVal));
 	if (!header.success) {
-		throw new Error("header is invalid");
+		return {};
 	}
 	return {
 		[header.data.key]: header.data.value,

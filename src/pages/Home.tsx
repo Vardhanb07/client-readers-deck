@@ -9,7 +9,9 @@ export default function Home() {
 	const state = location.state;
 	useEffect(() => {
 		if (state?.success === false) {
-			toast.error("header value is invalid");
+			toast.error("header value is invalid", {
+				id: "error-toast",
+			});
 		}
 	}, [state?.success]);
 	return (
