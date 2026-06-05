@@ -5,8 +5,9 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
-	readonly VITE_API: string;
 	// more env variables...
+	readonly VITE_API: string;
+	readonly VITE_CLERK_PUBLISHABLE_KEY: string;
 }
 
 interface ImportMeta {

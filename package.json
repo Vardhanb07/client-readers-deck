@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@clerk/clerk-react": "^5.61.3",
+    "@clerk/react": "^6.7.3",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.3.0",
