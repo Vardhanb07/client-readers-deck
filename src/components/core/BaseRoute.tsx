@@ -4,12 +4,12 @@ import SignInPage from "@/pages/SignInPage";
 import BaseSpinner from "./BaseSpinner";
 
 export default function BaseRoute() {
-  const { isLoaded, isSignedIn, getToken } = useAuth();
-  if (!isLoaded) {
-    return <BaseSpinner />;
-  }
-  if (!isSignedIn) {
-    return <SignInPage />;
-  }
-  return <Outlet context={[getToken]} />;
+	const { isLoaded, isSignedIn, getToken } = useAuth();
+	if (!isLoaded) {
+		return <BaseSpinner />;
+	}
+	if (!isSignedIn) {
+		return <SignInPage />;
+	}
+	return <Outlet context={[getToken]} />;
 }
