@@ -1,9 +1,10 @@
 import { SignIn } from "@clerk/react";
+import BaseLayout from "@/components/core/BaseLayout";
 
 export default function SignInPage() {
-	return (
-		<div className="flex h-screen w-screen justify-center items-center">
-			<SignIn />
-		</div>
-	);
+  return (
+    <BaseLayout title="" signInOrOutScreen={true}>
+      <SignIn />
+    </BaseLayout>
+  );
 }
