@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useOutletContext, useParams } from "react-router";
 import { toast } from "sonner";
 import BaseSpinner from "@/components/core/BaseSpinner";
 import { Button } from "@/components/ui/button";
@@ -16,17 +16,22 @@ export default function EditItem() {
 
 	const queryClient = useQueryClient();
 
+	const [getToken] =
+		useOutletContext<[getToken: () => Promise<null | string>]>();
+
 	const mutation = useMutation({
 		mutationFn: ({
 			formData,
 			categoryId,
 			id,
+			token,
 		}: {
 			formData: FormData;
 			categoryId: string | undefined;
 			id: string | undefined;
+			token: string | null;
 		}) => {
-			return api.patchItem({ formData, categoryId, id });
+			return api.patchItem({ formData, categoryId, id, token });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -38,7 +43,7 @@ export default function EditItem() {
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ["item", id],
 		queryFn: async () => {
-			return await api.getItem({ id });
+			return await api.getItem({ id, getToken });
 		},
 	});
 
@@ -65,14 +70,22 @@ export default function EditItem() {
 					</CardHeader>
 					<CardContent>
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
-								mutation.mutate({
-									formData: new FormData(e.currentTarget),
-									categoryId,
-									id,
-								});
-								navigate(`/dash/category/${categoryId}/items`);
+								try {
+									const token = await getToken();
+									mutation.mutate({
+										formData: new FormData(e.target),
+										categoryId,
+										id,
+										token,
+									});
+									navigate(`/category/${categoryId}/items`);
+								} catch (err) {
+									if (err instanceof Error) {
+										toast.error(err.message);
+									}
+								}
 							}}
 						>
 							<FieldGroup>
@@ -116,7 +129,7 @@ export default function EditItem() {
 			</div>
 			<div>
 				<Button>
-					<Link to={`/dash/category/${categoryId}/items`}>Go Back</Link>
+					<Link to={`/category/${categoryId}/items`}>Go Back</Link>
 				</Button>
 			</div>
 		</div>

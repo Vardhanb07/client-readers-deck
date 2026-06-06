@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useOutletContext } from "react-router";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -9,11 +10,20 @@ import { api } from "@/lib/api";
 export default function AddCategory() {
 	const navigate = useNavigate();
 
+	const [getToken] =
+		useOutletContext<[getToken: () => Promise<null | string>]>();
+
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: ({ formData }: { formData: FormData }) => {
-			return api.postCategory({ formData });
+		mutationFn: ({
+			formData,
+			token,
+		}: {
+			formData: FormData;
+			token: string | null;
+		}) => {
+			return api.postCategory({ formData, token });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -35,11 +45,18 @@ export default function AddCategory() {
 					</CardHeader>
 					<CardContent>
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
-								const formData = new FormData(e.currentTarget);
-								mutation.mutate({ formData });
-								navigate("/dash");
+								try {
+									const token = await getToken();
+									const formData = new FormData(e.target);
+									mutation.mutate({ formData, token });
+									navigate("/");
+								} catch (err) {
+									if (err instanceof Error) {
+										toast.error(err.message);
+									}
+								}
 							}}
 						>
 							<FieldGroup>
@@ -57,7 +74,7 @@ export default function AddCategory() {
 			</div>
 			<div>
 				<Button>
-					<Link to={"/dash"}>Go Back</Link>
+					<Link to={"/"}>Go Back</Link>
 				</Button>
 			</div>
 		</div>

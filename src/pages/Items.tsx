@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit, Info, SquarePlus, Trash2, Trash2Icon } from "lucide-react";
 import { useEffect } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useOutletContext, useParams } from "react-router";
 import { toast } from "sonner";
 import BaseLayout from "@/components/core/BaseLayout";
 import BaseSpinner from "@/components/core/BaseSpinner";
@@ -26,10 +26,13 @@ export default function Items() {
 
 	const queryClient = useQueryClient();
 
+	const [getToken] =
+		useOutletContext<[getToken: () => Promise<null | string>]>();
+
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ["category", categoryId, "items"],
 		queryFn: async () => {
-			return await api.getItems({ categoryId });
+			return await api.getItems({ categoryId, getToken });
 		},
 	});
 
@@ -40,8 +43,8 @@ export default function Items() {
 	}, [isError, error]);
 
 	const mutation = useMutation({
-		mutationFn: ({ id }: { id: number }) => {
-			return api.deleteItem({ id });
+		mutationFn: ({ id, token }: { id: number; token: string | null }) => {
+			return api.deleteItem({ id, token });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -55,7 +58,7 @@ export default function Items() {
 	}
 
 	return (
-		<BaseLayout title="Items">
+		<BaseLayout title="Items" signInOrOutScreen={false}>
 			<div className="mb-3">
 				<Link to={"add"} replace>
 					<SquarePlus />
@@ -112,8 +115,15 @@ export default function Items() {
 											</AlertDialogCancel>
 											<AlertDialogAction
 												variant="destructive"
-												onClick={() => {
-													mutation.mutate({ id: val.id });
+												onClick={async () => {
+													try {
+														const token = await getToken();
+														mutation.mutate({ id: val.id, token });
+													} catch (err) {
+														if (err instanceof Error) {
+															toast.error(err.message);
+														}
+													}
 												}}
 											>
 												Delete

@@ -7,7 +7,7 @@ import {
 	Trash2Icon,
 } from "lucide-react";
 import { useEffect } from "react";
-import { Link } from "react-router";
+import { Link, useOutletContext } from "react-router";
 import { toast } from "sonner";
 import BaseLayout from "@/components/core/BaseLayout";
 import BaseSpinner from "@/components/core/BaseSpinner";
@@ -29,10 +29,14 @@ import { api } from "@/lib/api";
 
 export default function Dash() {
 	const queryClient = useQueryClient();
+
+	const [getToken] =
+		useOutletContext<[getToken: () => Promise<null | string>]>();
+
 	const { data, isPending, isError, error } = useQuery({
 		queryKey: ["categories"],
 		queryFn: async () => {
-			return await api.getCategories();
+			return await api.getCategories(getToken);
 		},
 	});
 
@@ -45,8 +49,8 @@ export default function Dash() {
 	}, [isError, error]);
 
 	const mutation = useMutation({
-		mutationFn: ({ id }: { id: number }) => {
-			return api.deleteCategory({ id });
+		mutationFn: ({ id, token }: { id: number; token: string | null }) => {
+			return api.deleteCategory({ id, token });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -60,7 +64,7 @@ export default function Dash() {
 	}
 
 	return (
-		<BaseLayout title="Categories">
+		<BaseLayout title="Categories" signInOrOutScreen={false}>
 			<div className="mb-3">
 				<Link to={"category/add"} replace>
 					<SquarePlus />
@@ -98,8 +102,15 @@ export default function Dash() {
 											</AlertDialogCancel>
 											<AlertDialogAction
 												variant="destructive"
-												onClick={() => {
-													mutation.mutate({ id: val.id });
+												onClick={async () => {
+													try {
+														const token = await getToken();
+														mutation.mutate({ id: val.id, token });
+													} catch (err) {
+														if (err instanceof Error) {
+															toast.error(err.message);
+														}
+													}
 												}}
 											>
 												Delete

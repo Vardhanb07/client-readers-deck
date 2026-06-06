@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useOutletContext, useParams } from "react-router";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -11,17 +12,22 @@ export default function AddItem() {
 
 	const { categoryId } = useParams();
 
+	const [getToken] =
+		useOutletContext<[getToken: () => Promise<null | string>]>();
+
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
 		mutationFn: ({
 			formData,
 			categoryId,
+			token,
 		}: {
 			formData: FormData;
 			categoryId: string | undefined;
+			token: string | null;
 		}) => {
-			return api.postItem({ formData, categoryId });
+			return api.postItem({ formData, categoryId, token });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -43,13 +49,21 @@ export default function AddItem() {
 					</CardHeader>
 					<CardContent>
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
-								mutation.mutate({
-									formData: new FormData(e.currentTarget),
-									categoryId: categoryId,
-								});
-								navigate(`/dash/category/${categoryId}/items`);
+								try {
+									const token = await getToken();
+									mutation.mutate({
+										formData: new FormData(e.target),
+										categoryId: categoryId,
+										token: token,
+									});
+									navigate(`/category/${categoryId}/items`);
+								} catch (err) {
+									if (err instanceof Error) {
+										toast.error(err.message);
+									}
+								}
 							}}
 						>
 							<FieldGroup>
@@ -80,7 +94,7 @@ export default function AddItem() {
 			</div>
 			<div>
 				<Button>
-					<Link to={`/dash/category/${categoryId}/items`}>Go Back</Link>
+					<Link to={`/category/${categoryId}/items`}>Go Back</Link>
 				</Button>
 			</div>
 		</div>

@@ -1,19 +1,19 @@
 import * as z from "zod";
-import { getApiv1, getHeaders } from "./utils";
+import { getApiv1 } from "./utils";
 
+// send Bearer [token] in header
 class Apiv1 {
-	#apiv1 = "";
-	#headers = {};
-	constructor(apiv1: string, headers: { [index: string]: string }) {
+	#apiv1: string;
+	constructor(apiv1: string) {
 		this.#apiv1 = apiv1;
-		this.#headers = headers;
 	}
-	async getCategories() {
+	async getCategories(getToken: () => Promise<null | string>) {
+		const token = await getToken();
 		const res = await fetch(`${this.#apiv1}/category`, {
 			method: "GET",
 			headers: {
-				...this.#headers,
 				Accept: "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		const json = await res.json();
@@ -29,7 +29,13 @@ class Apiv1 {
 		}
 		return parsed.data;
 	}
-	postCategory({ formData }: { formData: FormData }) {
+	postCategory({
+		formData,
+		token,
+	}: {
+		formData: FormData;
+		token: string | null;
+	}) {
 		const name = formData.get("name");
 		if (!name) {
 			throw new Error("name is invalid");
@@ -37,8 +43,8 @@ class Apiv1 {
 		return fetch(`${this.#apiv1}/category`, {
 			method: "POST",
 			headers: {
-				...this.#headers,
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({ name }),
 		});
@@ -46,9 +52,11 @@ class Apiv1 {
 	patchCategory({
 		formData,
 		id,
+		token,
 	}: {
 		formData: FormData;
 		id: string | undefined;
+		token: string | null;
 	}) {
 		if (!id) {
 			throw new Error("id is invalid");
@@ -60,27 +68,36 @@ class Apiv1 {
 		return fetch(`${this.#apiv1}/category/${id}`, {
 			method: "PATCH",
 			headers: {
-				...this.#headers,
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({ name }),
 		});
 	}
-	deleteCategory({ id }: { id: number }) {
+	deleteCategory({ id, token }: { id: number; token: string | null }) {
 		return fetch(`${this.#apiv1}/category/${id}`, {
 			method: "DELETE",
-			headers: this.#headers,
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
 		});
 	}
-	async getItems({ categoryId }: { categoryId: string | undefined }) {
+	async getItems({
+		categoryId,
+		getToken,
+	}: {
+		categoryId: string | undefined;
+		getToken: () => Promise<null | string>;
+	}) {
+		const token = await getToken();
 		if (!categoryId) {
 			throw new Error("id is invalid");
 		}
 		const res = await fetch(`${this.#apiv1}/category/${categoryId}/item`, {
 			method: "GET",
 			headers: {
-				...this.#headers,
 				Accept: "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		const json = await res.json();
@@ -99,12 +116,19 @@ class Apiv1 {
 		}
 		return parsed.data;
 	}
-	async getItem({ id }: { id: string | undefined }) {
+	async getItem({
+		id,
+		getToken,
+	}: {
+		id: string | undefined;
+		getToken: () => Promise<null | string>;
+	}) {
+		const token = await getToken();
 		const res = await fetch(`${this.#apiv1}/item/${id}`, {
 			method: "GET",
 			headers: {
-				...this.#headers,
 				Accept: "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		const json = await res.json();
@@ -124,9 +148,11 @@ class Apiv1 {
 	postItem({
 		formData,
 		categoryId,
+		token,
 	}: {
 		formData: FormData;
 		categoryId: string | undefined;
+		token: string | null;
 	}) {
 		if (!categoryId) {
 			throw new Error("categoryId is invalid");
@@ -140,8 +166,8 @@ class Apiv1 {
 		return fetch(`${this.#apiv1}/item`, {
 			method: "POST",
 			headers: {
-				...this.#headers,
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				name: formData.get("name"),
@@ -155,10 +181,12 @@ class Apiv1 {
 		formData,
 		categoryId,
 		id,
+		token,
 	}: {
 		formData: FormData;
 		categoryId: string | undefined;
 		id: string | undefined;
+		token: string | null;
 	}) {
 		if (!categoryId) {
 			throw new Error("categoryId is invalid");
@@ -172,8 +200,8 @@ class Apiv1 {
 		return fetch(`${this.#apiv1}/item/${id}`, {
 			method: "PATCH",
 			headers: {
-				...this.#headers,
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				name: formData.get("name"),
@@ -183,12 +211,14 @@ class Apiv1 {
 			}),
 		});
 	}
-	deleteItem({ id }: { id: number }) {
+	deleteItem({ id, token }: { id: number; token: string | null }) {
 		return fetch(`${this.#apiv1}/item/${id}`, {
 			method: "DELETE",
-			headers: this.#headers,
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
 		});
 	}
 }
 
-export const api = new Apiv1(getApiv1(), getHeaders());
+export const api = new Apiv1(getApiv1());
