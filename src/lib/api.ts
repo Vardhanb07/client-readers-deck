@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { getApiv1 } from "./utils";
+import { getApiv1 } from "@/lib/utils";
 
 // send Bearer [token] in header
 class Apiv1 {
@@ -16,6 +16,9 @@ class Apiv1 {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+		if (!res.ok) {
+			throw new Error(`${res.statusText}, ${res.status}`);
+		}
 		const json = await res.json();
 		const parsedSchema = z.array(
 			z.object({
@@ -100,6 +103,9 @@ class Apiv1 {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+		if (!res.ok) {
+			throw new Error(`${res.statusText}, ${res.status}`);
+		}
 		const json = await res.json();
 		const parsedSchema = z.array(
 			z.object({
@@ -131,6 +137,9 @@ class Apiv1 {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+		if (!res.ok) {
+			throw new Error(`${res.statusText}, ${res.status}`);
+		}
 		const json = await res.json();
 		const parsedSchema = z.object({
 			id: z.number(),

@@ -1,7 +1,7 @@
 import { useAuth } from "@clerk/react";
 import { Outlet } from "react-router";
+import BaseSpinner from "@/components/core/BaseSpinner";
 import SignInPage from "@/pages/SignInPage";
-import BaseSpinner from "./BaseSpinner";
 
 export default function BaseRoute() {
 	const { isLoaded, isSignedIn, getToken } = useAuth();

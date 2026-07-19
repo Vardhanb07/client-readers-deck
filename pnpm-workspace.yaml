@@ -1,9 +1,9 @@
 allowBuilds:
   '@clerk/shared': true
-  bufferutil: set this to true or false
-  core-js: set this to true or false
+  bufferutil: false
+  core-js: false
   esbuild: false
   msw: false
   sharp: false
-  utf-8-validate: set this to true or false
+  utf-8-validate: false
   workerd: false

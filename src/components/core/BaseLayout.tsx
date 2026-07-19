@@ -1,7 +1,7 @@
 import { SignOutButton } from "@clerk/react";
 import { Home, LogOut } from "lucide-react";
 import { Link } from "react-router";
-import { ModeToggle } from "../ui/mode-toggle";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function BaseLayout({
 	children,
