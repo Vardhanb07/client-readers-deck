@@ -9,7 +9,7 @@ class Apiv1 {
         this.apiv1 = apiv1;
     }
 
-    async getCategories(getToken: () => Promise<null | string>) {
+    async getCategories(getToken: () => Promise<string | null>) {
         const token = await getToken();
         const res = await fetch(`${this.apiv1}/category`, {
             method: "GET",
@@ -28,11 +28,7 @@ class Apiv1 {
                 name: z.string(),
             }),
         );
-        const parsed = parsedSchema.safeParse(json);
-        if (!parsed) {
-            throw new Error("header is invalid");
-        }
-        return parsed.data;
+        return parsedSchema.parse(json)
     }
 
     postCategory({
@@ -95,8 +91,8 @@ class Apiv1 {
                        categoryId,
                        getToken,
                    }: {
-        categoryId: string | undefined;
-        getToken: () => Promise<null | string>;
+        categoryId?: string;
+        getToken: () => Promise<string | null>;
     }) {
         const token = await getToken();
         if (!categoryId) {
@@ -122,19 +118,15 @@ class Apiv1 {
                 currentPage: z.number(),
             }),
         );
-        const parsed = parsedSchema.safeParse(json);
-        if (!parsed.success) {
-            throw new Error("header is invalid");
-        }
-        return parsed.data;
+        return parsedSchema.parse(json)
     }
 
     async getItem({
                       id,
                       getToken,
                   }: {
-        id: string | undefined;
-        getToken: () => Promise<null | string>;
+        id?: string;
+        getToken: () => Promise<string | null>;
     }) {
         const token = await getToken();
         const res = await fetch(`${this.apiv1}/item/${id}`, {
@@ -155,11 +147,7 @@ class Apiv1 {
             pages: z.number(),
             currentPage: z.number(),
         });
-        const parsed = parsedSchema.safeParse(json);
-        if (!parsed.success) {
-            throw new Error("header is invalid");
-        }
-        return parsed.data;
+        return parsedSchema.parse(json)
     }
 
     postItem({

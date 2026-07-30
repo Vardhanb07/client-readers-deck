@@ -31,7 +31,7 @@ export default function Dash() {
     const queryClient = useQueryClient();
 
     const [getToken] =
-        useOutletContext<[getToken: () => Promise<null | string>]>();
+        useOutletContext<[getToken: () => Promise<string  | null>]>();
 
     const {showBoundary} = useErrorBoundary()
 
@@ -62,7 +62,7 @@ export default function Dash() {
                     </Link>
                 </div>
                 <div className="flex flex-col w-full h-full">
-                    {data?.map((val) => {
+                    {data.map((val) => {
                         return (
                             <Item key={val.id}>
                                 <ItemContent>{val.name}</ItemContent>

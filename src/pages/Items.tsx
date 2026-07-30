@@ -27,7 +27,7 @@ export default function Items() {
     const queryClient = useQueryClient();
 
     const [getToken] =
-        useOutletContext<[getToken: () => Promise<null | string>]>();
+        useOutletContext<[getToken: () => Promise<string | null>]>();
 
     const {showBoundary} = useErrorBoundary()
 

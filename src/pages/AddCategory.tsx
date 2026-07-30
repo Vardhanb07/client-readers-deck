@@ -11,7 +11,7 @@ export default function AddCategory() {
     const navigate = useNavigate();
 
     const [getToken] =
-        useOutletContext<[getToken: () => Promise<null | string>]>();
+        useOutletContext<[getToken: () => Promise<string | null>]>();
 
     const queryClient = useQueryClient();
 

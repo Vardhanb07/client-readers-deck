@@ -14,7 +14,7 @@ export default function AddItem() {
     const {categoryId} = useParams();
 
     const [getToken] =
-        useOutletContext<[getToken: () => Promise<null | string>]>();
+        useOutletContext<[getToken: () => Promise<string | null>]>();
 
     const queryClient = useQueryClient();
 
