@@ -1,0 +1,7 @@
+[[env]]
+key = "API"
+cmd = "skate get api@local-crd"
+
+[[env]]
+key = "VITE_CLERK_PUBLISHABLE_KEY"
+cmd = "skate get vite-clerk-publishable-key@local-crd"
